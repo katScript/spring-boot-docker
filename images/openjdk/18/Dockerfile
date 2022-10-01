@@ -25,9 +25,11 @@ RUN apt-get update && apt-get install -y \
     vim \
     zip
 
+#install openjdk 17 jdk and jre package
 RUN apt-get update && apt-get upgrade -y \
     && apt-get install -y openjdk-17-jdk openjdk-17-jre
 
+#install and setup maven
 RUN apt-get update \
     && wget https://dlcdn.apache.org/maven/maven-3/3.8.6/binaries/apache-maven-3.8.6-bin.tar.gz -P /tmp \
     && tar xf /tmp/apache-maven-*.tar.gz -C /opt && rm /tmp/apache-maven-*.tar.gz \
@@ -38,6 +40,11 @@ ENV MAVEN_HOME /opt/maven
 
 RUN export M2_HOME
 RUN export MAVEN_HOME
+
+#install nodejs and vue cli
+RUN apt-get update && curl -sL https://deb.nodesource.com/setup_16.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install -g @vue/cli
 
 ENV PATH ${M2_HOME}/bin:${PATH}
 
