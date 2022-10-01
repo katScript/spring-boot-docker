@@ -1,0 +1,34 @@
+#!/bin/bash
+BASE_URL=${1:-myhost.com}
+
+green=$(tput setaf 2)
+blue=$(tput setaf 4)
+normal=$(tput sgr0)
+
+rm -rf src
+mkdir -p src
+
+echo "${green}Restarting the containers...${normal}"
+bin/restart
+sleep 5
+
+bin/fixowns
+
+echo "${blue}Installing VueJS via NodeJs...${normal}"
+bin/clinotty vue init webpack-simple vue-tmp
+
+echo "${green}Copying all files from host to container...${normal}"
+bin/copytocontainer --all
+
+echo "${green}Copying all files from container to host after install...${normal}"
+bin/copyfromcontainer app
+bin/copyfromcontainer vendor
+
+echo "Create a DNS host entry for the site..."
+echo "127.0.0.1 ::1 $BASE_URL" | sudo tee -a /etc/hosts
+
+echo "Generating SSL certificate..."
+bin/setup-ssl $BASE_URL
+
+echo "${green}Docker development environment setup complete.${normal}"
+echo "You may now access your project at ${green} https://${BASE_URL}/${normal}"
