@@ -39,6 +39,14 @@ ENV MAVEN_HOME /opt/maven
 RUN export M2_HOME
 RUN export MAVEN_HOME
 
+
+RUN apt-get update \
+    && wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.67/bin/apache-tomcat-9.0.67.tar.gz -P /tmp \
+    && mkdir /opt/tomcat && tar xzvf /tmp/apache-tomcat-9*tar.gz -C /opt/tomcat --strip-components=1 && rm /tmp/apache-tomcat-9.0.67.tar.gz
+
+RUN chown -R app:app /opt/tomcat/ \
+    && chmod -R u+x /opt/tomcat/bin
+
 ENV PATH ${M2_HOME}/bin:${PATH}
 
 RUN export PATH
