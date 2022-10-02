@@ -17,9 +17,10 @@ services:
 
   app:
     build: images/openjdk/${JDK_VERSION}
-    tty: true
     links:
       - db
+    ports:
+      - "8091:8091"
     volumes: *appvolumes
 
   redis:

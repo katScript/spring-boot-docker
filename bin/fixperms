@@ -2,9 +2,8 @@
 echo "Correcting filesystem permissions..."
 
 if [ -z "$1" ]; then
-  bin/clinotty find public vendor resources -type f -exec chmod u+w {} \;
-  bin/clinotty find public vendor resources -type d -exec chmod u+w {} \;
-  bin/clinotty chmod u+x artisan
+  bin/clinotty find views/dist views/public -type f -exec chmod u+w {} \;
+  bin/clinotty find views/dist views/public -type d -exec chmod u+w {} \;
 else
   bin/clinotty find $1 -type f -exec chmod u+w {} \;
   bin/clinotty find $1 -type d -exec chmod u+w {} \;

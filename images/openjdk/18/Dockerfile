@@ -21,6 +21,7 @@ RUN apt-get update && apt-get install -y \
     libxslt1-dev \
     libzip-dev \
     lsof \
+    systemctl \
     default-mysql-client \
     vim \
     zip
@@ -37,9 +38,11 @@ RUN apt-get update \
 
 ENV M2_HOME /opt/maven
 ENV MAVEN_HOME /opt/maven
+ENV SPRING_JAR_NAME spring-boot-service
 
 RUN export M2_HOME
 RUN export MAVEN_HOME
+RUN export SPRING_JAR_NAME
 
 #install nodejs and vue cli
 RUN apt-get update && curl -sL https://deb.nodesource.com/setup_16.x | bash - \
@@ -49,6 +52,22 @@ RUN apt-get update && curl -sL https://deb.nodesource.com/setup_16.x | bash - \
 ENV PATH ${M2_HOME}/bin:${PATH}
 
 RUN export PATH
+
+RUN touch /etc/systemd/system/springboot.service
+
+RUN echo -e "[Unit] \
+    \nDescription=Spring boot service \
+    \nAfter=syslog.target \
+    \nAfter=network.target[Service] \
+    \nUser=app \
+    \n\n[Service] \
+    \nExecStart=/usr/bin/java -jar /var/www/html/target/spring-boot-service.jar --server.port=8091 \
+    \nSuccessExitStatus=143 \
+    \nTimeoutStopSec=10 \
+    \nRestart=on-failure \
+    \nRestartSec=5 \
+    \n\n[Install] \
+    \nWantedBy=multi-user.target" >> /etc/systemd/system/springboot.service
 
 RUN mkdir -p /etc/nginx/html /var/www/html /sock \
   && chown -R app:app /etc/nginx /var/www /sock
