@@ -1,1 +1,65 @@
 #!bin/bash
+GIT=""
+BRANCH=""
+DATABASE=""
+BASE_URL
+
+green=$(tput setaf 2)
+blue=$(tput setaf 4)
+normal=$(tput sgr0)
+
+read -p "GIT Url (git src code): " -e -i "git@github.com:katScript/spring-vue.git" GIT
+read -p "GIT Branch: " -e -i "main" BRANCH
+read -p "DATABASE (you can leave it empty to skip the sql import): " -e -i "mysql/file_name.sql" DATABASE
+read -p "BASE_URL: " -e -i "local.myhost.com" BASE_URL
+
+if [ -n "$GIT" ] && [ -n "$BRANCH" ] && [ -n "$BASE_URL" ];
+then
+    rm -rf src
+    mkdir -p src
+
+    echo "${green}Restarting the containers...${normal}"
+    bin/restart
+    sleep 5
+
+    if [ -z "$DATABASE" ]
+    then
+        echo "${blue}Skip database import...${normal}"
+    else
+        echo "${green}Import database...${normal}"
+        bin/mysql-import $DATABASE
+    fi
+
+    bin/fixowns
+
+    echo "${green}Pull the code & switch the branch...${normal}"
+    bin/git-init $GIT $BRANCH
+
+    echo "${green}Build frontend with vuejs...${normal}"
+    bin/clinotty (cd views && npm run build)
+
+    echo "${green}Create spring boot service...${normal}"
+
+    echo "${green}Copying all files from host to container...${normal}"
+    bin/copytocontainer --all
+
+    bin/clinotty mvn install
+    bin/clinotty mvn clean package
+
+    bin/rootnotty ln -s /var/www/html/target/spring-boot-service.jar /etc/init.d/springboot
+    bin/clinotty systemctl daemon-reload
+
+    echo "${green}Enable spring boot service...${normal}"
+    bin/clinotty systemctl enable springboot.service
+
+    echo "Create a DNS host entry for the site..."
+    echo "127.0.0.1 ::1 $BASE_URL" | sudo tee -a /etc/hosts
+
+    echo "Generating SSL certificate..."
+    bin/setup-ssl $BASE_URL
+
+    echo "${green}Docker development environment setup complete.${normal}"
+    echo "You may now access your project at ${green} https://${BASE_URL}/${normal}"
+else
+    echo "All fiends above are required to setup, please fill..."
+fi

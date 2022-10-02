@@ -14,15 +14,42 @@ sleep 5
 
 bin/fixowns
 
-echo "${blue}Installing VueJS via NodeJs...${normal}"
-bin/clinotty vue init webpack-simple vue-tmp
+echo "${blue}Installing Spring boot application...${normal}"
+bin/clinotty mvn archetype:generate -DgroupId=com.spring.app -DartifactId=spring-boot -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
+
+echo "${blue}Prepare Spring boot application...${normal}"
+mv -v src/spring-boot/* src/
+rm -rf src/spring-boot
+
+echo "${blue}Installing vuejs...${normal}"
+bin/clinotty echo -e "\n" | bin/clinotty vue create vue-js
+mkdir src/views
+mv -v src/vue-js/* src/views/
+rm -rf src/vue-js
+
+echo "${blue}Copying pom.xml file...${normal}"
+cp env/maven/pom.xml src/
+echo "${blue}Copying vuejs config file...${normal}"
+cp env/vuejs/* src/views
+
+echo "${green}Build frontend with vuejs...${normal}"
+bin/clinotty npm run build
+
+echo "${green}Create spring boot service...${normal}"
+rm src/src/main/java/com/spring/app/App.java
+cp env/maven/Application.java src/src/main/java/com/spring/app/
 
 echo "${green}Copying all files from host to container...${normal}"
 bin/copytocontainer --all
 
-echo "${green}Copying all files from container to host after install...${normal}"
-bin/copyfromcontainer app
-bin/copyfromcontainer vendor
+bin/clinotty mvn install
+bin/clinotty mvn clean package
+
+bin/rootnotty ln -s /var/www/html/target/spring-boot-service.jar /etc/init.d/springboot
+bin/clinotty systemctl daemon-reload
+
+echo "${green}Enable spring boot service...${normal}"
+bin/clinotty systemctl enable springboot.service
 
 echo "Create a DNS host entry for the site..."
 echo "127.0.0.1 ::1 $BASE_URL" | sudo tee -a /etc/hosts
