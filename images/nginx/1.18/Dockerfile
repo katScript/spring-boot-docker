@@ -1,19 +1,72 @@
 FROM nginx:1.18
 MAINTAINER Tunq <katforscript@gmail.com>
 
+ENV DEBIAN_FRONTEND noninteractive
+RUN export DEBIAN_FRONTEND
+
 RUN groupadd -g 1000 app \
  && useradd -g 1000 -u 1000 -d /var/www -s /bin/bash app
+
 RUN touch /var/run/nginx.pid
 
 RUN mkdir /sock
 
-RUN apt-get update && apt-get install -y \
-  curl \
-  libnss3-tools \
-  openssl
+RUN apt-get update && apt-get upgrade -y && apt-get install -y \
+    curl \
+    git \
+    wget \
+    gzip \
+    libbz2-dev \
+    libfreetype6-dev \
+    libicu-dev \
+    libmcrypt-dev \
+    libpng-dev \
+    libssh2-1-dev \
+    libxslt1-dev \
+    libzip-dev \
+    lsof \
+    default-mysql-client \
+    vim \
+    zip
+
+RUN mkdir -p /usr/share/man/man1  \
+    && apt-get install -y default-jre default-jdk
+
+RUN wget https://dlcdn.apache.org/maven/maven-3/3.8.6/binaries/apache-maven-3.8.6-bin.tar.gz -P /tmp \
+    && tar xf /tmp/apache-maven-*.tar.gz -C /opt && rm /tmp/apache-maven-*.tar.gz \
+    && ln -s /opt/apache-maven-* /opt/maven
+
+ENV M2_HOME /opt/maven
+ENV MAVEN_HOME /opt/maven
+ENV SPRING_JAR_NAME spring-boot-service
+
+RUN export M2_HOME
+RUN export MAVEN_HOME
+RUN export SPRING_JAR_NAME
+
+ENV PATH ${M2_HOME}/bin:${PATH}
+
+RUN export PATH
 
 RUN mkdir /etc/nginx/certs \
   && echo -e "\n\n\n\n\n\n\n" | openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/certs/nginx.key -out /etc/nginx/certs/nginx.crt
+
+RUN mkdir /tmp/springboot-service \
+    && touch /tmp/springboot-service/springboot.service \
+    && echo -e "[Unit] \
+    \nDescription=Spring boot service \
+    \nAfter=syslog.target \
+    \nAfter=network.target[Service] \
+    \nUser=app \
+    \n\n[Service] \
+    \nExecStart=/usr/bin/java -jar /var/www/html/target/${SPRING_JAR_NAME}.jar --server.port=8091 \
+    \nSuccessExitStatus=143 \
+    \nTimeoutStopSec=10 \
+    \nRestart=on-failure \
+    \nRestartSec=5 \
+    \n\n[Install] \
+    \nWantedBy=multi-user.target" >> /tmp/springboot-service/springboot.service
+
 
 RUN ( \
   cd /usr/local/bin/ \

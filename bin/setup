@@ -22,10 +22,7 @@ mv -v src/spring-boot/* src/
 rm -rf src/spring-boot
 
 echo "${blue}Installing vuejs...${normal}"
-bin/clinotty echo -e "\n" | bin/clinotty vue create vue-js
-mkdir src/views
-mv -v src/vue-js/* src/views/
-rm -rf src/vue-js
+bin/vue echo -e "\n" | bin/vue create vue-js
 
 echo "${blue}Copying pom.xml file...${normal}"
 cp env/maven/pom.xml src/
