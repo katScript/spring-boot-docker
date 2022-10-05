@@ -17,6 +17,8 @@ services:
 
   app:
     build: images/nodejs/${NODEJS_VERSION}
+    tty: true
+    command: tail -f /dev/null
     volumes: *appvolumes
 
   redis:
