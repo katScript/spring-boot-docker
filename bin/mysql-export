@@ -2,5 +2,5 @@
 [ -z "$1" ] && echo "Example: bin/mysql-export mysql/database.sql" && exit
 
 source env/db.env
-bin/cli mysqldump -hdb -u${MYSQL_USER} -p${MYSQL_PASSWORD} ${MYSQL_DATABASE} > "$@"
+bin/jdk mysqldump -hdb -u${MYSQL_USER} -p${MYSQL_PASSWORD} ${MYSQL_DATABASE} > "$@"
 echo "The database is successfully exported at $@"
