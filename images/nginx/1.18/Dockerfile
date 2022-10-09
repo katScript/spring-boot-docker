@@ -38,7 +38,7 @@ RUN wget https://dlcdn.apache.org/maven/maven-3/3.8.6/binaries/apache-maven-3.8.
 
 ENV M2_HOME /opt/maven
 ENV MAVEN_HOME /opt/maven
-ENV SPRING_JAR_NAME spring-boot-service
+ENV SPRING_JAR_NAME springboot-service
 
 RUN export M2_HOME
 RUN export MAVEN_HOME
@@ -48,8 +48,9 @@ ENV PATH ${M2_HOME}/bin:${PATH}
 
 RUN export PATH
 
-RUN mkdir /etc/nginx/certs \
-  && echo -e "\n\n\n\n\n\n\n" | openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/certs/nginx.key -out /etc/nginx/certs/nginx.crt
+RUN mkdir /etc/nginx/certs /etc/nginx/certs/site /etc/nginx/certs/api \
+  && echo -e "\n\n\n\n\n\n\n" | openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/certs/site/nginx.key -out /etc/nginx/certs/site/nginx.crt \
+  && echo -e "\n\n\n\n\n\n\n" | openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/certs/api/nginx.key -out /etc/nginx/certs/api/nginx.crt
 
 RUN mkdir /tmp/springboot-service \
     && touch /tmp/springboot-service/springboot.service \
@@ -59,7 +60,7 @@ RUN mkdir /tmp/springboot-service \
     \nAfter=network.target[Service] \
     \nUser=app \
     \n\n[Service] \
-    \nExecStart=/usr/bin/java -jar /var/www/html/target/${SPRING_JAR_NAME}.jar --server.port=8091 \
+    \nExecStart=/usr/bin/java -jar /var/www/html/target/springboot-service.jar --server.port=8091 \
     \nSuccessExitStatus=143 \
     \nTimeoutStopSec=10 \
     \nRestart=on-failure \
@@ -78,7 +79,8 @@ COPY ./conf/nginx.conf /etc/nginx/
 COPY ./conf/default.conf /etc/nginx/conf.d/
 
 RUN mkdir -p /etc/nginx/includes
-COPY ./conf/sample/nginx.sample.conf /etc/nginx/includes/
+COPY conf/nodejs/nginx.nodejs.conf /etc/nginx/includes/
+COPY conf/api/nginx.api.conf /etc/nginx/includes/
 
 RUN mkdir -p /etc/nginx/html /var/www/html \
   && chown -R app:app /etc/nginx /var/www /var/cache/nginx /var/run/nginx.pid /sock

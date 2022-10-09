@@ -46,7 +46,7 @@
     </dependencies>
 
     <build>
-        <finalName>${env.SPRING_JAR_NAME}</finalName>
+        <finalName>springboot-service</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

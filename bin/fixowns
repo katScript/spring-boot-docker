@@ -1,12 +1,14 @@
 #!/bin/bash
+
+red=$(tput setaf 1)
+normal=$(tput sgr0)
+
 echo "Correcting filesystem ownerships..."
 
-if [ -z "$1" ]; then
-  bin/r-jdknotty chown -R app:app /var/www/
-  bin/r-nodejsnotty chown -R app:app /var/www/html
+if [[ -z "$1" ]]; then
+  bin/r-jdknotty chown -R app:app /var/www /var/www/html
 else
-  bin/r-jdknotty chown -R app:app /var/www/html/$1
-  bin/r-nodejsnotty chown -R app:app /var/www/html/views/$1
+  bin/r-jdknotty chown -R app:app $1
 fi
 
-echo "Filesystem ownerships corrected."
+echo "Done."
