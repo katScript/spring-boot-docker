@@ -2,7 +2,7 @@
 GIT=""
 BRANCH=""
 DATABASE=""
-BASE_URL
+BASE_URL=""
 
 green=$(tput setaf 2)
 blue=$(tput setaf 4)
@@ -36,7 +36,7 @@ then
     bin/git-init $GIT $BRANCH
 
     echo "${green}Build frontend with vuejs...${normal}"
-    bin/clinotty (cd views && npm run build)
+    bin/r-nodejsnotty npm run build
 
     echo "${green}Create spring boot service...${normal}"
 
@@ -46,7 +46,7 @@ then
     bin/clinotty mvn install
     bin/clinotty mvn clean package
 
-    bin/rootnotty ln -s /var/www/html/target/spring-boot-service.jar /etc/init.d/springboot
+    bin/rootnotty ln -s /var/www/html/target/springboot-service.jar /etc/init.d/springboot
     bin/clinotty systemctl daemon-reload
 
     echo "${green}Enable spring boot service...${normal}"
