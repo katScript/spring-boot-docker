@@ -11,7 +11,6 @@ fi
 docker-compose exec -T -u root server mkcert -key-file nginx.key -cert-file nginx.crt "$2"
 echo "Moving key and cert to /etc/nginx/certs/..."
 docker-compose exec -T -u root server chown app:app nginx.key nginx.crt
-docker-compose exec -T -u root server mkdir /etc/nginx/certs/$1
 docker-compose exec -T -u root server mv nginx.key nginx.crt /etc/nginx/certs/$1/
 
 # Restart nginx to apply the updates
