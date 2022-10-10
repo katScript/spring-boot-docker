@@ -22,9 +22,9 @@ start() {
   fi
   echo 'Starting service…' >&2
   local CMD="$SCRIPT &> \"$LOGFILE\" & echo \$!"
-#  su -c "$CMD" $RUNAS > "$PIDFILE"
- # Try with this command line instead of above if not workable
-  su -s /bin/sh $RUNAS -c "$CMD" > "$PIDFILE"
+  su -c "$CMD" $RUNAS > "$PIDFILE"
+#  Try with this command line instead of above if not workable
+#  su -s /bin/sh $RUNAS -c "$CMD" > "$PIDFILE"
  
   sleep 5
   PID=$(cat $PIDFILE)
