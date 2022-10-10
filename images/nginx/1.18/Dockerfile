@@ -27,6 +27,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
     lsof \
     default-mysql-client \
     vim \
+    procps \
     zip
 
 RUN mkdir -p /usr/share/man/man1  \
@@ -52,22 +53,8 @@ RUN mkdir /etc/nginx/certs /etc/nginx/certs/site /etc/nginx/certs/api \
   && echo -e "\n\n\n\n\n\n\n" | openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/certs/site/nginx.key -out /etc/nginx/certs/site/nginx.crt \
   && echo -e "\n\n\n\n\n\n\n" | openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/certs/api/nginx.key -out /etc/nginx/certs/api/nginx.crt
 
-RUN mkdir /tmp/springboot-service \
-    && touch /tmp/springboot-service/springboot.service \
-    && echo -e "[Unit] \
-    \nDescription=Spring boot service \
-    \nAfter=syslog.target \
-    \nAfter=network.target[Service] \
-    \nUser=app \
-    \n\n[Service] \
-    \nExecStart=/usr/bin/java -jar /var/www/html/target/springboot-service.jar --server.port=8091 \
-    \nSuccessExitStatus=143 \
-    \nTimeoutStopSec=10 \
-    \nRestart=on-failure \
-    \nRestartSec=5 \
-    \n\n[Install] \
-    \nWantedBy=multi-user.target" >> /tmp/springboot-service/springboot.service
-
+RUN mkdir /tmp/springboot-service
+COPY ./env/springboot.sh /tmp/springboot-service/
 
 RUN ( \
   cd /usr/local/bin/ \

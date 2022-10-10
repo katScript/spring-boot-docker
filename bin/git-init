@@ -8,4 +8,5 @@ find $REAL_SRC -type f -exec chmod u+w {} \;
 cd $REAL_SRC
 git init
 git remote add origin $1
-git checkout -b $GIT_BRANCH
+git fetch --all
+git checkout $GIT_BRANCH
