@@ -17,7 +17,7 @@ read -p "API_URL: " -e -i "myhost.api.local" API_URL
 
 if [ -n "$GIT" ] && [ -n "$BRANCH" ] && [ -n "$SITE_URL" ] && [ -n "$API_URL" ]; then
   rm -rf src
-  mkdir -p src
+  mkdir -p src src/views
 
   echo "${green}Restarting the containers...${normal}"
   bin/restart
