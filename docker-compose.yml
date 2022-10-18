@@ -7,6 +7,7 @@ services:
     ports:
       - "80:8000"
       - "443:8443"
+      - "5005:5005"
     links:
       - db
       - app
@@ -17,6 +18,7 @@ services:
 
   app:
     build: images/nodejs/${NODEJS_VERSION}
+#    this is for local develop
     tty: true
     ports:
        - "8080:8080"

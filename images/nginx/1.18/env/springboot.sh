@@ -9,6 +9,7 @@
 ### END INIT INFO
 
 SCRIPT="/usr/bin/java -jar /var/www/html/target/*.jar --server.port=8091"
+DEBUG="/usr/bin/java -jar -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 /var/www/html/target/*.jar --server.port=8091"
 RUNAS=root
 NAME=springboot
 
@@ -23,9 +24,23 @@ start() {
   echo 'Starting service…' >&2
   local CMD="$SCRIPT &> \"$LOGFILE\" & echo \$!"
   su -c "$CMD" $RUNAS > "$PIDFILE"
-#  Try with this command line instead of above if not workable
-#  su -s /bin/sh $RUNAS -c "$CMD" > "$PIDFILE"
  
+  sleep 5
+  PID=$(cat $PIDFILE)
+    if pgrep -u $RUNAS -f $NAME > /dev/null
+    then
+      echo "$NAME is now running, the PID is $PID"
+    else
+      echo ''
+      echo "Error! Could not start $NAME!"
+    fi
+}
+
+debug() {
+  echo 'Starting debug mode…' >&2
+  local CMD="$DEBUG &> \"$LOGFILE\" & echo \$!"
+  su -c "$CMD" $RUNAS > "$PIDFILE"
+
   sleep 5
   PID=$(cat $PIDFILE)
     if pgrep -u $RUNAS -f $NAME > /dev/null
@@ -94,6 +109,10 @@ case "$1" in
     stop
     start
     ;;
+  debug)
+    stop
+    debug
+    ;;
   *)
-    echo "Usage: $0 {start|stop|status|restart|uninstall}"
+    echo "Usage: $0 {start|stop|status|restart|uninstall|debug}"
 esac
