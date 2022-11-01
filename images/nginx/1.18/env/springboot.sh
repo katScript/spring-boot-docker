@@ -24,7 +24,7 @@ start() {
   echo 'Starting service…' >&2
   local CMD="$SCRIPT &> \"$LOGFILE\" & echo \$!"
   su -c "$CMD" $RUNAS > "$PIDFILE"
- 
+
   sleep 5
   PID=$(cat $PIDFILE)
     if pgrep -u $RUNAS -f $NAME > /dev/null
@@ -38,6 +38,7 @@ start() {
 
 debug() {
   echo 'Starting debug mode…' >&2
+  sleep 5
   local CMD="$DEBUG &> \"$LOGFILE\" & echo \$!"
   su -c "$CMD" $RUNAS > "$PIDFILE"
 
@@ -83,7 +84,7 @@ status() {
         PID=$(cat $PIDFILE)
             if [ -z "$(ps axf | grep ${PID} | grep -v grep)" ]; then
                 printf "%s\n" "The process appears to be dead but pidfile still exists"
-            else    
+            else
                 echo "Running, the PID is $PID"
             fi
     else
