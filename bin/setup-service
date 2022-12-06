@@ -8,6 +8,7 @@ docker-compose exec -T -u root server touch /var/run/springboot.pid
 docker-compose exec -T -u root server touch /var/log/springboot.log
 
 docker-compose exec -T -u root server cp /tmp/springboot-service/springboot.sh /etc/init.d/springboot
+docker-compose exec -T -u root server sed -i -e 's/\r//g' /etc/init.d/springboot
 docker-compose exec -T -u root server chmod +x /etc/init.d/springboot
 docker-compose exec -T -u root server update-rc.d springboot defaults
 
