@@ -33,7 +33,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
 RUN mkdir -p /usr/share/man/man1  \
     && apt-get install -y default-jre default-jdk
 
-RUN wget https://dlcdn.apache.org/maven/maven-3/3.8.6/binaries/apache-maven-3.8.6-bin.tar.gz -P /tmp \
+RUN wget https://dlcdn.apache.org/maven/maven-3/3.8.8/binaries/apache-maven-3.8.8-bin.tar.gz -P /tmp \
     && tar xf /tmp/apache-maven-*.tar.gz -C /opt && rm /tmp/apache-maven-*.tar.gz \
     && ln -s /opt/apache-maven-* /opt/maven
 
